@@ -1,0 +1,24 @@
+#!/bin/sh
+# ADMS safety check — blocks data from being committed.
+fail=0
+files=$(git diff --cached --name-only --diff-filter=ACM)
+for f in $files; do
+  case "$f" in
+    docs/*.png|docs/*.jpg|docs/*/*.png|docs/*/*.jpg|icons/*.png) ;;
+    *.json|*.xlsx|*.xls|*.csv|*.pdf|*.zip|*.png|*.jpg|*.jpeg|*.heic|*backup*|*Backup*)
+      echo "BLOQUEADO: $f (posible dato/backup — no se sube a GitHub)"; fail=1 ;;
+  esac
+done
+if echo "$files" | grep -qx "index.html"; then
+  if ! git show :index.html | grep -q "const INITIAL_DRIVERS = \[\];"; then
+    echo "BLOQUEADO: index.html tiene conductores precargados (seed). Debe ser INITIAL_DRIVERS = []"; fail=1
+  fi
+  if ! git show :index.html | grep -q "const INITIAL_VEHICLES = \[\];"; then
+    echo "BLOQUEADO: index.html tiene vehiculos precargados (seed). Debe ser INITIAL_VEHICLES = []"; fail=1
+  fi
+  if git show :index.html | grep -Eq "dodId: '[0-9]{10}'"; then
+    echo "BLOQUEADO: index.html contiene DOD ID"; fail=1
+  fi
+fi
+[ $fail -eq 0 ] || { echo "Commit cancelado por seguridad (ver SECURITY.md)."; exit 1; }
+exit 0

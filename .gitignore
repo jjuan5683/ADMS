@@ -1,0 +1,25 @@
+# ADMS — never commit data
+*.json
+*.xlsx
+*.xls
+*.csv
+*.pdf
+*.zip
+*.bak
+*backup*
+*Backup*
+ADMS_*
+PMCS_*
+*.png
+*.jpg
+*.jpeg
+*.heic
+!docs/**/*.png
+!docs/**/*.jpg
+!icons/*.png
+# OS / editor
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/

@@ -9,7 +9,7 @@ Offline, single-file web app for company-level **Master Driver Management**, veh
 | Option | How |
 |---|---|
 | Local (recommended for field use) | Download `index.html` and open it in Chrome or Edge. Works with no internet. |
-| GitHub Pages | Settings → Pages → Branch `main` / root. Open `https://<user>.github.io/<repo>/`. The page loads from GitHub, but your data stays in that browser. |
+| GitHub Pages (installable PWA) | Settings → Pages → Branch `main` / root. Open `https://<user>.github.io/<repo>/`. The page loads from GitHub, but your data stays in that browser. After the first load it works offline; on the phone use *Add to Home Screen* / *Install*. |
 
 ### Load your data (restore backup)
 1. Open the app → **JSON (import)** → select your backup file (`.json`, encrypted if you set a password).
@@ -26,6 +26,11 @@ M1079A1P2 · M1151A1 · M1165A1 · M1078A1P2 · M1083A1 · M1084A1 MHC · M1152A
 - The PMCS checklist is **generic by vehicle family — must be confirmed against each TM -10** (see `docs/PMCS-SPEC.md`).
 - PMCS PDFs are worksheets for DA Form 5988-E / GCSS-Army entry; they do not replace the official form.
 - Do not store medical diagnoses, medications, VA data, convoy routes, frequencies/COMSEC, weapons assignments or coordinates.
+
+## PWA files
+`manifest.webmanifest` (name, icons, standalone) · `sw.js` (caches only the app shell; network-first, so a new `index.html` is picked up when online; never touches your data) · `icons/` (192, 512, maskable, Apple touch) · `404.html` · `robots.txt` (no indexing). On `file://` the service worker is skipped and the app works as before.
+
+To release an update, bump `CACHE` in `sw.js` (e.g. `adms-shell-v6.3-1`) in the same commit as the new `index.html`.
 
 ## Developer setup
 ```bash

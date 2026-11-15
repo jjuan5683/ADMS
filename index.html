@@ -2,12 +2,16 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8"/>
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data: blob:; font-src data:; frame-src blob:; media-src blob:; connect-src 'none'; object-src 'none'; worker-src 'none'; manifest-src 'none'; base-uri 'none'; form-action 'none'"/>
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src 'self' data: blob:; font-src data:; frame-src blob:; media-src blob:; connect-src 'none'; object-src 'none'; worker-src 'self'; manifest-src 'self'; base-uri 'none'; form-action 'none'"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
 <meta name="apple-mobile-web-app-capable" content="yes"/>
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
 <meta name="apple-mobile-web-app-title" content="ADMS"/>
 <meta name="theme-color" content="#060a0f"/>
+<meta name="robots" content="noindex,nofollow"/>
+<link rel="manifest" href="manifest.webmanifest"/>
+<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png"/>
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png"/>
 <title>ADMS v6.2 — Army Driver Management System</title>
 <script>/* react/umd/react.production.min.js */
 /**
@@ -1284,6 +1288,9 @@ button.wa-sug.on .wa-mark{background:var(--green);color:var(--bg);border-color:v
 .history-row .hfault,.history-row .hreq{margin-left:8px}
 @media(max-width:700px){.pmcs-head .three-col{grid-template-columns:1fr}}
 </style>
+<script>/* PWA: only on http(s) (GitHub Pages); file:// keeps working without it */
+(function(){try{if('serviceWorker' in navigator && /^https?:$/.test(location.protocol)){window.addEventListener('load',function(){navigator.serviceWorker.register('sw.js',{scope:'./'}).catch(function(e){console.warn('ADMS SW not registered:',e&&e.message)});});}}catch(e){}})();
+</script>
 </head>
 <body>
 <div id="toast-container" aria-live="polite" aria-atomic="false"></div>

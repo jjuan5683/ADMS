@@ -10,3 +10,9 @@
 5. **On devices:** turn on the Vault (password) on shared tablets, lock when not in use, and keep encrypted backups in an authorized location only (not personal cloud).
 6. **Photos:** the app re-compresses them and removes EXIF/GPS. Do not upload photos showing bumper numbers, plates or the facility.
 7. **Reporting:** if real data is committed by mistake, do not only delete the file. Rewrite history (`git filter-repo`), rotate the backup password, and notify the chain of command / unit security manager.
+
+## PWA / GitHub Pages notes
+- GitHub Pages sites are public even when the repo is private (unless your plan supports private Pages). The app is blank, so this is acceptable; **never** put data in the repo.
+- CSP in this package is relaxed only for same-origin `worker-src`, `manifest-src` and `img-src`. Network access stays blocked (`connect-src 'none'`); the CI check fails if that changes or if a CDN is added.
+- The service worker caches only static app files. Data stays in localStorage / IndexedDB of the browser and is not cached or synced.
+- `safety-check.yml` repeats the pre-commit rules on GitHub, because a local hook can be skipped.
