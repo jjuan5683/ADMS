@@ -12,7 +12,7 @@
 <link rel="manifest" href="manifest.webmanifest"/>
 <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png"/>
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png"/>
-<title>ADMS v6.2 — Army Driver Management System</title>
+<title>ADMS v6.3 — Army Driver Management System</title>
 <script>/* react/umd/react.production.min.js */
 /**
  * @license React
@@ -1287,6 +1287,8 @@ button.wa-sug.on .wa-mark{background:var(--green);color:var(--bg);border-color:v
 @media(max-width:700px){.req-row{grid-template-columns:1fr 1fr}.req-row .req-type,.req-row .req-note{grid-column:1/-1}.pmcs-cat-head{flex-wrap:wrap;gap:6px}}
 .history-row .hfault,.history-row .hreq{margin-left:8px}
 @media(max-width:700px){.pmcs-head .three-col{grid-template-columns:1fr}}
+
+.edit-banner{display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap;margin:10px 0;padding:10px 12px;border:1px solid #f59e0b;background:rgba(245,158,11,.10);color:#fbbf24;border-radius:6px;font-size:13px}
 </style>
 <script>/* PWA: only on http(s) (GitHub Pages); file:// keeps working without it */
 (function(){try{if('serviceWorker' in navigator && /^https?:$/.test(location.protocol)){window.addEventListener('load',function(){navigator.serviceWorker.register('sw.js',{scope:'./'}).catch(function(e){console.warn('ADMS SW not registered:',e&&e.message)});});}}catch(e){}})();
@@ -2772,7 +2774,7 @@ function makeTripTickets(m, vehs, drivers) {
     sig('Convoy Cmdr — firma / fecha', L + 360);
     doc.setFontSize(7.5);
     doc.setTextColor(120);
-    doc.text(`ADMS v6.2 · ${m.id} · ${v.bumper} · página ${pi + 1}/${mVehs.length}`, L, 770);
+    doc.text(`ADMS v6.3 · ${m.id} · ${v.bumper} · página ${pi + 1}/${mVehs.length}`, L, 770);
     doc.setTextColor(0);
   });
   doc.save(`TRIP_TICKETS_${(m.name || m.id).replace(/[^\w-]+/g, '_')}_${m.spDate || todayStr()}.pdf`);
@@ -3691,7 +3693,7 @@ function App() {
     className: "logo-text"
   }, "ADMS"), React.createElement("div", {
     className: "logo-sub"
-  }, "ARMY DRIVER MGMT SYS v6.2"))), React.createElement("nav", {
+  }, "ARMY DRIVER MGMT SYS v6.3"))), React.createElement("nav", {
     "aria-label": "Secciones"
   }, NAV.map(n => React.createElement("button", {
     key: n.id,
@@ -6889,13 +6891,14 @@ async function pmcsHash(rec) {
     return [...new Uint8Array(buf)].slice(0, 8).map(b => b.toString(16).padStart(2, '0')).join('').toUpperCase();
   } catch (e) { return ''; }
 }
+const canEditRec = r => !!r && r.date === todayStr() && r.v === 2 && !!r.results;
 const recFaults = r => (r.faults || []).map(f => typeof f === 'string' ? { item: f } : f);
 const recOpName = (r, drivers) => { const d = drivers.find(x => x.id === r.operator); return d ? [d.rank, d.name].filter(Boolean).join(' ') : r.operatorName || ''; };
 
 /* ---------- PDF ---------- */
 function pdfFooter(doc, label) {
   const n = doc.getNumberOfPages(), pw = doc.internal.pageSize.getWidth(), ph = doc.internal.pageSize.getHeight();
-  for (let p = 1; p <= n; p++) { doc.setPage(p); doc.setFontSize(7.5); doc.setTextColor(120); doc.text(`ADMS v6.2 · ${label} · página ${p}/${n}`, 40, ph - 22); doc.text('CUI / PII cuando contiene datos — Privacy Act — destruir según SOP', pw - 40, ph - 22, { align: 'right' }); doc.setTextColor(0); }
+  for (let p = 1; p <= n; p++) { doc.setPage(p); doc.setFontSize(7.5); doc.setTextColor(120); doc.text(`ADMS v6.3 · ${label} · página ${p}/${n}`, 40, ph - 22); doc.text('CUI / PII cuando contiene datos — Privacy Act — destruir según SOP', pw - 40, ph - 22, { align: 'right' }); doc.setTextColor(0); }
 }
 function pdfBar(doc, y, text, L, R) {
   doc.setFillColor(30, 49, 72); doc.rect(L, y - 10, R - L, 16, 'F');
@@ -6946,6 +6949,7 @@ function renderPmcsRecord(doc, rec, veh, drivers) {
   y = pdfBar(doc, y, '3. REQUESTS', L, R);
   const rr = (rec.requests || []).map(r => [reqLabel(r.type), r.to || '—', r.at || '—', r.status + (r.doneAt ? ' ' + r.doneAt.replace('T', ' ') : ''), r.note || '']);
   y = pdfTable(doc, y, [{ h: 'REQUEST', w: 150 }, { h: 'TO', w: 80 }, { h: 'TIME', w: 50 }, { h: 'STATUS', w: 110 }, { h: 'NOTE', w: 142 }], rr, { empty: 'NO REQUESTS.' });
+  if ((rec.edits || []).length) { y += 4; doc.setFontSize(8); doc.setTextColor(150, 90, 0); doc.text(`EDITED ${(rec.edits || []).length}x same day — last: ${(rec.editedAt || '').replace('T', ' ').slice(0, 16)} by ${rec.editedBy || '—'}`, L, y); doc.setTextColor(0); y += 10; }
   if (rec.partial) { y += 4; doc.setFontSize(8); doc.setTextColor(150, 90, 0); doc.text(`PARTIAL PMCS — ${c.nc || 0} item(s) not checked. Status did not improve the previous vehicle status.`, L, y); doc.setTextColor(0); y += 10; }
   y += 6; doc.setFontSize(7.5); doc.setTextColor(90);
   doc.text('ST: X = deficiency (NMC) · (X) = operate under limitations · / = shortcoming · - = inspection/service overdue · ? = not classified (DA PAM 750-8). Checklist genérico ADMS — POR CONFIRMAR contra TM -10.', L, y, { maxWidth: R - L });
@@ -7043,7 +7047,7 @@ function PmcsExportModal({ vehs, pmcs, drivers, onClose, defaultVeh }) {
 }
 
 /* ---------- HISTORY MODAL (evidencia por vehículo) ---------- */
-function PmcsHistoryModal({ veh, pmcs, setPmcs, drivers, onClose }) {
+function PmcsHistoryModal({ veh, pmcs, setPmcs, drivers, onClose, onEdit }) {
   const list = pmcs[veh.id] || [];
   const [open, setOpen] = useState(null);
   const [exp, setExp] = useState(false);
@@ -7068,12 +7072,14 @@ function PmcsHistoryModal({ veh, pmcs, setPmcs, drivers, onClose }) {
         hh('div', { className: 'history-row clickable', role: 'button', tabIndex: 0, 'aria-expanded': isOpen, onClick: () => setOpen(isOpen ? null : i), onKeyDown: e => (e.key === 'Enter' || e.key === ' ') && (e.preventDefault(), setOpen(isOpen ? null : i)) },
           hh('div', null, hh('span', { className: 'hdate' }, r.date, ' ', r.time || ''), hh('span', { className: 'hop' }, ivName(r.iv)), hh('span', { className: 'hop' }, recOpName(r, drivers) || 'sin operador'), r.partial && hh('span', { className: 'hfault' }, 'PARCIAL')),
           hh('div', { className: 'inline-row' }, fl.length > 0 && hh('span', { className: 'hfault' }, fl.length, ' FALLA', fl.length > 1 ? 'S' : ''), (r.requests || []).some(q => q.status === 'REQUESTED') && hh('span', { className: 'hreq' }, 'REQ'), hh(Dot, { status: r.status, label: true }),
+            canEditRec(r) && onEdit && hh('button', { type: 'button', className: 'btn btn-primary btn-sm', onClick: e => { e.stopPropagation(); onEdit(r); } }, 'EDITAR'),
             hh('button', { type: 'button', className: 'btn btn-ghost btn-sm', onClick: e => { e.stopPropagation(); makePmcsPdf(r, veh, drivers); } }, 'PDF'))),
         isOpen && hh('div', { className: 'hist-detail' },
           fl.length ? fl.map((f, k) => hh('div', { key: k }, hh('b', null, f.sym ? PMCS_SYM[f.sym]?.s + ' ' : '? '), f.item, f.std || f.text ? ' — ' + (f.std || f.text).replace(/\n/g, ' · ') : '')) : hh('div', null, 'Sin fallas'),
           (r.requests || []).map((q, k) => hh('div', { key: 'q' + k, className: 'req-line' }, hh('b', null, reqLabel(q.type)), ` → ${q.to || '—'} · ${q.at || ''} · ${REQ_STATUS[q.status] || q.status}${q.doneAt ? ' ' + q.doneAt.replace('T', ' ') : ''}${q.note ? ' · ' + q.note : ''} `,
             q.status === 'REQUESTED' && hh('span', { className: 'inline-row' }, hh('button', { type: 'button', className: 'btn btn-ghost btn-sm', onClick: () => setReq(r.id, k, 'COMPLETED') }, 'COMPLETADO'), hh('button', { type: 'button', className: 'btn btn-ghost btn-sm', onClick: () => setReq(r.id, k, 'CANCELLED') }, 'CANCELAR')))),
           hh('div', { className: 'mono-sm' }, `P/F/NA/NC ${r.counts ? `${r.counts.pass}/${r.counts.fail}/${r.counts.na}/${r.counts.nc || 0}` : '—'} · Odómetro ${r.odometer || '—'} · ${r.location || ''}`),
+          (r.edits || []).length > 0 && hh('div', { className: 'mono-sm warn-txt' }, `EDITADO ${(r.edits || []).length}× · última: ${(r.editedAt || '').replace('T', ' ').slice(0, 19)} por ${r.editedBy || '—'}`),
           hh('div', { className: 'mono-sm' }, `Registrado por: ${r.recordedBy || '—'} · ${r.ts ? r.ts.replace('T', ' ').slice(0, 19) : ''} · ID ${r.id}${r.hash ? ' · hash ' + r.hash : ''}`)));
     }),
     list.length >= PMCS_CAP && hh('div', { className: 'warn-hint' }, `⚠ Se guardan los últimos ${PMCS_CAP} por vehículo. Exporta el PDF compacto mensual como evidencia permanente.`),
@@ -7100,6 +7106,7 @@ function PmcsTab({ vehs, setVehs, drivers, pmcs, setPmcs }) {
   const [histOpen, setHistOpen] = useState(false);
   const [expOpen, setExpOpen] = useState(false);
   const [busy, setBusy] = useState(false);
+  const [editId, setEditId] = useState(null);
   const veh = vehs.find(v => v.id === selVeh);
   const allItems = useMemo(() => veh ? pmcsItems(veh.model) : [], [veh && veh.model]);
   const items = useMemo(() => allItems.filter(i => ivShow(i, iv)), [allItems, iv]);
@@ -7109,6 +7116,7 @@ function PmcsTab({ vehs, setVehs, drivers, pmcs, setPmcs }) {
   const clearForm = () => { setRes({}); setFlt({}); setExtra([]); setReqs([]); setOdo(''); setHrs(''); setSup(''); setCol({}); };
   useEffect(() => {
     if (!draftKey) return;
+    setEditId(null);
     const d = LS.get(draftKey);
     if (d) { setIv(d.iv || 'B'); setRes(d.res || {}); setFlt(d.flt || {}); setExtra(d.extra || []); setReqs(d.reqs || []); setOdo(d.odo || ''); setHrs(d.hrs || ''); setSup(d.sup || ''); setSelOp(d.op || ''); setCol({}); showToast('Borrador PMCS recuperado', 'info'); } else clearForm();
     setDone(null);
@@ -7116,10 +7124,27 @@ function PmcsTab({ vehs, setVehs, drivers, pmcs, setPmcs }) {
   useEffect(() => {
     if (!draftKey) return;
     if (savedKey.current !== draftKey) { savedKey.current = draftKey; return; }
-    if (done) return;
+    if (done || editId) return;
     if (Object.keys(res).length || extra.length || reqs.length) LS.set(draftKey, { iv, res, flt, extra, reqs, odo, hrs, sup, op: selOp, at: new Date().toISOString() });
-  }, [draftKey, iv, res, flt, extra, reqs, odo, hrs, sup, selOp, done]);
+  }, [draftKey, iv, res, flt, extra, reqs, odo, hrs, sup, selOp, done, editId]);
   useEffect(() => { LS.set('adms:pmcs-automin', autoMin); }, [autoMin]);
+  const startEdit = r => {
+    if (!canEditRec(r)) { showToast('Solo se pueden editar PMCS del mismo día', 'error'); return; }
+    const f = {}, ex = [];
+    (r.faults || []).forEach(x => { const o = typeof x === 'string' ? { item: x } : x; const base = { sym: o.sym || '', text: o.text || '', std: o.std || '', action: o.action || '', leak: o.leak || '', notified: !!o.notified }; if (o.itemId && o.itemId !== 'EXTRA') f[o.itemId] = base; else ex.push({ key: uid(), item: o.item || '', cat: 'WALK', ...base }); });
+    setHistOpen(false); setDone(null);
+    setIv(r.iv || 'B'); setRes({ ...(r.results || {}) }); setFlt(f); setExtra(ex);
+    setReqs((r.requests || []).map(q => ({ key: uid(), type: q.type, to: q.to, at: q.at, note: q.note || '', status: q.status, doneAt: q.doneAt || '' })));
+    setOdo(r.odometer || ''); setHrs(r.hours || ''); setSup(r.supervisor || ''); setSelOp(r.operator || ''); setCol({});
+    setEditId(r.id);
+    try { window.scrollTo(0, 0); } catch (e) {}
+  };
+  const cancelEdit = () => {
+    setEditId(null); setDone(null);
+    const d = draftKey ? LS.get(draftKey) : null;
+    if (d) { setIv(d.iv || 'B'); setRes(d.res || {}); setFlt(d.flt || {}); setExtra(d.extra || []); setReqs(d.reqs || []); setOdo(d.odo || ''); setHrs(d.hrs || ''); setSup(d.sup || ''); setSelOp(d.op || ''); setCol({}); } else clearForm();
+    showToast('Edición cancelada — sin cambios', 'info');
+  };
   const cats = [...new Set(items.map(i => i.cat))];
   const tick = (id, val) => {
     const nres = { ...res, [id]: val };
@@ -7155,17 +7180,22 @@ function PmcsTab({ vehs, setVehs, drivers, pmcs, setPmcs }) {
     try {
       const results = {};
       items.forEach(i => { if (res[i.id]) results[i.id] = res[i.id]; });
-      const prev = veh.pmcsStatus;
+      const orig = editId ? history.find(r => r.id === editId) : null;
+      if (editId && !canEditRec(orig)) { setEditId(null); showToast('Ya no se puede editar: el PMCS no es de hoy', 'error'); return; }
+      const prev = orig ? (orig.prevStatus || '') : veh.pmcsStatus;
       const vStatus = partial && prev ? worstSt(prev, status) : status;
       const op = drivers.find(d => d.id === selOp);
-      const record = { id: uid(), v: 2, vehId: selVeh, bumper: veh.bumper, date: todayStr(), time: nowLocal().slice(11, 16), ts: new Date().toISOString(), iv, operator: selOp, operatorName: op ? [op.rank, op.name].filter(Boolean).join(' ') : '', supervisor: sup.trim().slice(0, 60), odometer: String(odo).trim(), hours: String(hrs).trim(), location: locLabel(veh), model: veh.model, family: vehFamily(veh.model), results, total: items.length, partial, faults: faults.map(f => ({ itemId: f.itemId, item: f.item, es: f.es || '', sym: f.sym || '', text: (f.text || '').trim(), std: stdLines(f.std).join('\n'), action: (f.action || '').trim(), leak: f.leak || '', notified: !!f.notified })), requests: reqs.map(r => ({ type: r.type, to: r.to, at: r.at, note: (r.note || '').trim().slice(0, 80), status: r.status, doneAt: r.status === 'REQUESTED' ? '' : nowLocal() })), status: vStatus, inspStatus: status, prevStatus: prev || '', counts, recordedBy: getOperator() || '' };
+      const record = { id: orig ? orig.id : uid(), v: 2, vehId: selVeh, bumper: veh.bumper, date: orig ? orig.date : todayStr(), time: orig ? orig.time : nowLocal().slice(11, 16), ts: orig ? orig.ts : new Date().toISOString(), iv, operator: selOp, operatorName: op ? [op.rank, op.name].filter(Boolean).join(' ') : '', supervisor: sup.trim().slice(0, 60), odometer: String(odo).trim(), hours: String(hrs).trim(), location: locLabel(veh), model: veh.model, family: vehFamily(veh.model), results, total: items.length, partial, faults: faults.map(f => ({ itemId: f.itemId, item: f.item, es: f.es || '', sym: f.sym || '', text: (f.text || '').trim(), std: stdLines(f.std).join('\n'), action: (f.action || '').trim(), leak: f.leak || '', notified: !!f.notified })), requests: reqs.map(r => ({ type: r.type, to: r.to, at: r.at, note: (r.note || '').trim().slice(0, 80), status: r.status, doneAt: r.status === 'REQUESTED' ? '' : (r.doneAt || nowLocal()) })), status: vStatus, inspStatus: status, prevStatus: prev || '', counts, recordedBy: orig ? (orig.recordedBy || '') : (getOperator() || '') };
+      if (orig) { const nowIso = new Date().toISOString(); record.edits = [...(orig.edits || []), { at: nowIso, by: getOperator() || '', prevHash: orig.hash || '', prevStatus: orig.status || '' }].slice(-10); record.editedAt = nowIso; record.editedBy = getOperator() || ''; }
       record.hash = await pmcsHash(record);
-      setPmcs(p => ({ ...p, [selVeh]: [record, ...(p[selVeh] || [])].slice(0, PMCS_CAP) }));
-      setVehs(p => p.map(v => v.id === selVeh ? { ...v, pmcsStatus: vStatus, lastPmcs: todayStr(), lastFaults: record.faults.length, ...(record.odometer ? { lastOdometer: record.odometer } : {}) } : v));
-      audit('PMCS', `${veh.bumper} ${ivName(iv)} ${vStatus}${partial ? ' PARCIAL' : ''} · ${record.faults.length} fallas · ${record.requests.length} requests`, 'Vehículo');
-      LS.del(draftKey);
+      setPmcs(p => ({ ...p, [selVeh]: orig ? (p[selVeh] || []).map(r => r.id === orig.id ? record : r) : [record, ...(p[selVeh] || [])].slice(0, PMCS_CAP) }));
+      const isLatest = !orig || history[0]?.id === orig.id;
+      if (isLatest) setVehs(p => p.map(v => v.id === selVeh ? { ...v, pmcsStatus: vStatus, lastPmcs: todayStr(), lastFaults: record.faults.length, ...(record.odometer ? { lastOdometer: record.odometer } : {}) } : v));
+      audit(orig ? 'PMCS EDIT' : 'PMCS', `${veh.bumper} ${ivName(iv)} ${vStatus}${partial ? ' PARCIAL' : ''} · ${record.faults.length} fallas · ${record.requests.length} requests${orig ? ' · edición #' + record.edits.length : ''}`, 'Vehículo');
+      if (!orig) LS.del(draftKey);
+      setEditId(null);
       setDone(record);
-      showToast(vStatus === 'RED' ? 'PMCS registrado — vehículo RED / NMC. Notificar al Motor Sergeant.' : vStatus === 'AMBER' ? 'PMCS registrado — vehículo AMBER' : `PMCS registrado — GREEN${partial ? ' (parcial)' : ''}`, vStatus === 'RED' ? 'error' : vStatus === 'AMBER' ? 'info' : 'success', 6000);
+      showToast(orig ? `PMCS actualizado — ${vStatus}` : vStatus === 'RED' ? 'PMCS registrado — vehículo RED / NMC. Notificar al Motor Sergeant.' : vStatus === 'AMBER' ? 'PMCS registrado — vehículo AMBER' : `PMCS registrado — GREEN${partial ? ' (parcial)' : ''}`, vStatus === 'RED' ? 'error' : vStatus === 'AMBER' ? 'info' : 'success', 6000);
     } finally { setBusy(false); }
   };
   if (!vehs.length) return hh('div', { className: 'panel' }, hh('div', { className: 'no-items' }, 'No hay vehículos. Agrega la flota en FLEET para hacer PMCS.'));
@@ -7183,6 +7213,7 @@ function PmcsTab({ vehs, setVehs, drivers, pmcs, setPmcs }) {
       hh('div', { className: 'inline-row pmcs-actions' },
         hh('button', { type: 'button', className: 'btn btn-ghost btn-sm', onClick: () => setHistOpen(true) }, I.Clock, ` HISTORIAL (${history.length})`),
         hh('button', { type: 'button', className: 'btn btn-ghost btn-sm', onClick: () => setExpOpen(true) }, I.Download, ' EXPORTAR PMCS')),
+      editId && !done && hh('div', { className: 'edit-banner', role: 'status' }, hh('span', null, '✎ EDITANDO PMCS de hoy ', hh('b', null, (history.find(r => r.id === editId) || {}).time || ''), ' — los cambios quedan en la bitácora y en el historial del registro.'), hh('button', { type: 'button', className: 'btn btn-ghost btn-sm', onClick: cancelEdit }, 'CANCELAR EDICIÓN')),
       !done && hh('div', { className: 'pmcs-opts' },
         hh('div', { className: 'field' }, hh('label', null, 'Intervalo'), hh('div', { className: 'filter-group', role: 'radiogroup', 'aria-label': 'Intervalo PMCS' }, PMCS_IV.map(x => hh('button', { key: x.k, type: 'button', role: 'radio', 'aria-checked': iv === x.k, className: `filter-btn${iv === x.k ? ' active' : ''}`, onClick: () => setIv(x.k), title: x.en }, x.k, ' · ', x.es)))),
         hh('div', { className: 'field' }, hh('label', null, 'Odómetro (mi)'), hh('input', { inputMode: 'numeric', value: odo, maxLength: 7, placeholder: veh?.lastOdometer ? `último ${veh.lastOdometer}` : '', onChange: e => setOdo(e.target.value.replace(/[^\d.]/g, '')) })),
@@ -7196,10 +7227,11 @@ function PmcsTab({ vehs, setVehs, drivers, pmcs, setPmcs }) {
       showRef && hh('div', { className: 'pmcs-ref' }, Object.values(PMCS_SYM).map(s => hh('div', { key: s.s }, hh('b', null, s.s), ' ', s.lbl.replace(/^.+? — /, ''), ' → ', s.st)), hh('div', null, hh('b', null, '?'), ' Sin clasificar → AMBER'), Object.entries(LEAK_CLASSES).map(([k, v]) => hh('div', { key: k }, v)), hh('div', { className: 'mono-sm' }, 'Un PMCS parcial nunca mejora el estado anterior del vehículo. Fuente: DA PAM 750-8 y TM -10 (verificar edición vigente).'))),
     done ? hh('div', { className: `pmcs-done st-${done.status}` },
       hh('div', { className: 'pmcs-done-icon' }, I.Check),
-      hh('div', { className: 'pmcs-done-title' }, 'PMCS REGISTRADO — ', done.status, done.partial ? ' (PARCIAL)' : ''),
+      hh('div', { className: 'pmcs-done-title' }, (done.edits || []).length ? 'PMCS ACTUALIZADO — ' : 'PMCS REGISTRADO — ', done.status, done.partial ? ' (PARCIAL)' : ''),
       hh('div', { className: 'pmcs-done-sub' }, `${done.date} ${done.time} · ${done.faults.length} falla(s) · ${done.requests.length} request(s)${done.partial ? ` · ${done.counts.nc} sin verificar` : ''}${done.hash ? ' · hash ' + done.hash : ''}`),
       hh('div', { className: 'inline-row', style: { justifyContent: 'center', marginTop: '16px', flexWrap: 'wrap' } },
         hh('button', { className: 'btn btn-primary', onClick: () => makePmcsPdf(done, veh, drivers) }, I.Download, ' PDF DE ESTE PMCS'),
+        canEditRec(done) && hh('button', { className: 'btn btn-ghost', onClick: () => startEdit(done) }, I.Edit || '✎', ' EDITAR ESTE PMCS'),
         hh('button', { className: 'btn btn-ghost', onClick: () => setHistOpen(true) }, I.Clock, ' HISTORIAL'),
         hh('button', { className: 'btn btn-ghost', onClick: () => { clearForm(); setDone(null); } }, I.Plus, ' NUEVA INSPECCIÓN'))) :
     hh(React.Fragment, null,
@@ -7234,13 +7266,13 @@ function PmcsTab({ vehs, setVehs, drivers, pmcs, setPmcs }) {
           hh('input', { 'aria-label': 'Nota', className: 'req-note', maxLength: 80, placeholder: r.type === 'PARTS' ? 'Pieza / NSN (sin datos sensibles)' : 'Nota corta', value: r.note, onChange: e => updReq(r.key, { note: e.target.value }) }),
           hh('button', { type: 'button', className: 'btn btn-danger btn-sm', 'aria-label': 'Quitar request', onClick: () => setReqs(p => p.filter(x => x.key !== r.key)) }, '✕')))),
       hh('button', { className: `pmcs-submit${canSave ? ' ready' : ' disabled'}`, onClick: canSave ? submit : undefined, 'aria-disabled': !canSave },
-        !canSave ? 'MARCA AL MENOS UN ÍTEM, FALLA O REQUEST' : busy ? 'GUARDANDO…' : partial ? `✓ REGISTRAR PMCS PARCIAL (${answered}/${items.length}) — ${status}` : `✓ REGISTRAR PMCS (${ivName(iv).toUpperCase()}) — ${status}`)),
+        !canSave ? 'MARCA AL MENOS UN ÍTEM, FALLA O REQUEST' : busy ? 'GUARDANDO…' : editId ? `✓ GUARDAR CAMBIOS${partial ? ' (PARCIAL ' + answered + '/' + items.length + ')' : ''} — ${status}` : partial ? `✓ REGISTRAR PMCS PARCIAL (${answered}/${items.length}) — ${status}` : `✓ REGISTRAR PMCS (${ivName(iv).toUpperCase()}) — ${status}`)),
     history.length > 0 && hh('div', { className: 'panel', style: { marginTop: '16px' } },
       hh('div', { className: 'panel-title' }, I.Clock, ' ÚLTIMOS PMCS ', hh('button', { type: 'button', className: 'link-btn', onClick: () => setHistOpen(true) }, `ver los ${history.length}`)),
       history.slice(0, 5).map((r, i) => hh('div', { key: r.id || i, className: 'history-row' },
         hh('div', null, hh('span', { className: 'hdate' }, fmtDate(r.date), r.time ? ' ' + r.time : ''), hh('span', { className: 'hop' }, recOpName(r, drivers) || '—'), r.partial && hh('span', { className: 'hfault' }, 'PARCIAL')),
-        hh('div', { className: 'inline-row' }, recFaults(r).length > 0 && hh('span', { className: 'hfault' }, recFaults(r).length, ' FALLA(S)'), hh(Dot, { status: r.status, label: true }))))),
-    histOpen && veh && hh(PmcsHistoryModal, { veh, pmcs, setPmcs, drivers, onClose: () => setHistOpen(false) }),
+        hh('div', { className: 'inline-row' }, recFaults(r).length > 0 && hh('span', { className: 'hfault' }, recFaults(r).length, ' FALLA(S)'), (r.edits || []).length > 0 && hh('span', { className: 'hreq' }, 'EDIT'), canEditRec(r) && hh('button', { type: 'button', className: 'btn btn-ghost btn-sm', onClick: () => startEdit(r) }, 'EDITAR'), hh(Dot, { status: r.status, label: true }))))),
+    histOpen && veh && hh(PmcsHistoryModal, { veh, pmcs, setPmcs, drivers, onClose: () => setHistOpen(false), onEdit: startEdit }),
     expOpen && hh(PmcsExportModal, { vehs, pmcs, drivers, defaultVeh: selVeh, onClose: () => setExpOpen(false) }));
 }
 
@@ -7382,7 +7414,7 @@ function FuelLogTab({
       html += `</tbody></table>`;
     });
     html += `<div class="sig"><div class="sig-line">Motor Sergeant / Firma &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Fecha</div><div class="sig-line">Convoy Commander / Firma &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Fecha</div></div>
-    <div class="footer">ADMS v6.2 — Army Driver Management System | 124 MP HHD | Fort Buchanan PR</div>`;
+    <div class="footer">ADMS v6.3 — Army Driver Management System | 124 MP HHD | Fort Buchanan PR</div>`;
     const elem = document.createElement('div');
     elem.innerHTML = html;
     elem.style.cssText = 'position:fixed;top:-9999px;left:-9999px;background:white;width:8.5in;font-family:Arial,sans-serif;';
@@ -8097,7 +8129,7 @@ function ExportModal({
             pdf.setPage(p);
             pdf.setFontSize(7);
             pdf.setTextColor(110);
-            pdf.text(`ADMS v6.2 · ${todayStr()} · página ${p}/${np}`, pgW - 8, pgH - 5, {
+            pdf.text(`ADMS v6.3 · ${todayStr()} · página ${p}/${np}`, pgW - 8, pgH - 5, {
               align: 'right'
             });
           }
@@ -8643,7 +8675,7 @@ function ExportXlsxModal({
           'Valor': '124 MP HHD / Fort Buchanan PR'
         }, {
           'Campo': 'Generado Por',
-          'Valor': 'ADMS v6.2'
+          'Valor': 'ADMS v6.3'
         }, {
           'Campo': 'Total Conductores',
           'Valor': opts.includeDrivers ? filteredDrivers.length : 0
@@ -9896,16 +9928,16 @@ function HelpModal({
     className: "help-sec"
   }, React.createElement("h3", null, t), children);
   return React.createElement(Modal, {
-    title: "GU\xCDA R\xC1PIDA \u2014 ADMS v6.2",
+    title: "GU\xCDA R\xC1PIDA \u2014 ADMS v6.3",
     onClose: onClose,
     wide: true
   }, React.createElement("div", {
     className: "help-content"
   }, React.createElement("h2", {
     className: "help-print-title"
-  }, "ADMS v6.2 \u2014 Gu\xEDa r\xE1pida"), React.createElement(S, {
+  }, "ADMS v6.3 \u2014 Gu\xEDa r\xE1pida"), React.createElement(S, {
     t: "1. Antes de empezar"
-  }, React.createElement("ul", null, React.createElement("li", null, "Abre ", React.createElement("b", null, "ADMS-v6.2.html"), " en Chrome o Edge. No necesita internet y no env\xEDa datos a ning\xFAn lado."), React.createElement("li", null, "Los datos viven ", React.createElement("b", null, "solo en ese navegador y esa computadora"), ". Otro navegador u otra PC = ADMS vac\xEDo."), React.createElement("li", null, "Pon tu nombre en ", React.createElement("b", null, "OP:"), " (arriba a la derecha). Cada cambio queda en la BIT\xC1CORA con ese nombre."))), React.createElement(S, {
+  }, React.createElement("ul", null, React.createElement("li", null, "Abre ", React.createElement("b", null, "ADMS-v6.3.html"), " en Chrome o Edge. No necesita internet y no env\xEDa datos a ning\xFAn lado."), React.createElement("li", null, "Los datos viven ", React.createElement("b", null, "solo en ese navegador y esa computadora"), ". Otro navegador u otra PC = ADMS vac\xEDo."), React.createElement("li", null, "Pon tu nombre en ", React.createElement("b", null, "OP:"), " (arriba a la derecha). Cada cambio queda en la BIT\xC1CORA con ese nombre."))), React.createElement(S, {
     t: "2. Cargar los datos de la unidad"
   }, React.createElement("ol", null, React.createElement("li", null, "DRIVERS \u2192 ", React.createElement("b", null, "PLANTILLA"), ". Se descarga un Excel con los conductores actuales."), React.createElement("li", null, "Llena veh\xEDculos autorizados (separados con ", React.createElement("b", null, "\" | \""), ", nombres exactos de la hoja MODELOS), fechas del DA 5984-E y calificaciones."), React.createElement("li", null, "DRIVERS \u2192 ", React.createElement("b", null, "importar XLSX"), " \u2192 revisa la vista previa \u2192 ", React.createElement("b", null, "CONFIRMAR"), ". Nada se borra; una celda vac\xEDa no cambia el dato actual."))), React.createElement(S, {
     t: "3. Backup (lo m\xE1s importante)"
