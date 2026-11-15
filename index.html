@@ -2,17 +2,13 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8"/>
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src 'self' data: blob:; font-src data:; frame-src blob:; media-src blob:; connect-src 'none'; object-src 'none'; worker-src 'self'; manifest-src 'self'; base-uri 'none'; form-action 'none'"/>
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data: blob:; font-src data:; frame-src blob:; media-src blob:; connect-src 'none'; object-src 'none'; worker-src 'none'; manifest-src 'none'; base-uri 'none'; form-action 'none'"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
 <meta name="apple-mobile-web-app-capable" content="yes"/>
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
 <meta name="apple-mobile-web-app-title" content="ADMS"/>
 <meta name="theme-color" content="#060a0f"/>
-<meta name="robots" content="noindex,nofollow"/>
-<link rel="manifest" href="manifest.webmanifest"/>
-<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png"/>
-<link rel="apple-touch-icon" href="icons/apple-touch-icon.png"/>
-<title>ADMS v6.3 — Army Driver Management System</title>
+<title>ADMS v6.4 — Army Driver Management System</title>
 <script>/* react/umd/react.production.min.js */
 /**
  * @license React
@@ -1289,10 +1285,17 @@ button.wa-sug.on .wa-mark{background:var(--green);color:var(--bg);border-color:v
 @media(max-width:700px){.pmcs-head .three-col{grid-template-columns:1fr}}
 
 .edit-banner{display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap;margin:10px 0;padding:10px 12px;border:1px solid #f59e0b;background:rgba(245,158,11,.10);color:#fbbf24;border-radius:6px;font-size:13px}
+
+.exp-grid{display:grid;grid-template-columns:minmax(260px,1fr) minmax(320px,1.15fr);gap:16px;align-items:start}
+.exp-opts .opt-grp{margin:10px 0}
+.exp-opts .opt-grp-title{font-family:var(--mono,monospace);font-size:11px;letter-spacing:.08em;color:#f59e0b;margin-bottom:4px}
+.exp-opts .chk-line{display:block;padding:3px 0}
+.exp-prev{position:sticky;top:0}
+.exp-prev-head{display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap;margin-bottom:6px}
+.exp-frame{width:100%;height:62vh;min-height:420px;border:1px solid #2a3a4f;background:#fff;border-radius:4px}
+.modal:has(.exp-grid){max-width:1120px;width:96vw}
+@media(max-width:900px){.exp-grid{grid-template-columns:1fr}.exp-prev{position:static}.exp-frame{height:50vh;min-height:320px}}
 </style>
-<script>/* PWA: only on http(s) (GitHub Pages); file:// keeps working without it */
-(function(){try{if('serviceWorker' in navigator && /^https?:$/.test(location.protocol)){window.addEventListener('load',function(){navigator.serviceWorker.register('sw.js',{scope:'./'}).catch(function(e){console.warn('ADMS SW not registered:',e&&e.message)});});}}catch(e){}})();
-</script>
 </head>
 <body>
 <div id="toast-container" aria-live="polite" aria-atomic="false"></div>
@@ -2774,7 +2777,7 @@ function makeTripTickets(m, vehs, drivers) {
     sig('Convoy Cmdr — firma / fecha', L + 360);
     doc.setFontSize(7.5);
     doc.setTextColor(120);
-    doc.text(`ADMS v6.3 · ${m.id} · ${v.bumper} · página ${pi + 1}/${mVehs.length}`, L, 770);
+    doc.text(`ADMS v6.4 · ${m.id} · ${v.bumper} · página ${pi + 1}/${mVehs.length}`, L, 770);
     doc.setTextColor(0);
   });
   doc.save(`TRIP_TICKETS_${(m.name || m.id).replace(/[^\w-]+/g, '_')}_${m.spDate || todayStr()}.pdf`);
@@ -3693,7 +3696,7 @@ function App() {
     className: "logo-text"
   }, "ADMS"), React.createElement("div", {
     className: "logo-sub"
-  }, "ARMY DRIVER MGMT SYS v6.3"))), React.createElement("nav", {
+  }, "ARMY DRIVER MGMT SYS v6.4"))), React.createElement("nav", {
     "aria-label": "Secciones"
   }, NAV.map(n => React.createElement("button", {
     key: n.id,
@@ -6898,7 +6901,7 @@ const recOpName = (r, drivers) => { const d = drivers.find(x => x.id === r.opera
 /* ---------- PDF ---------- */
 function pdfFooter(doc, label) {
   const n = doc.getNumberOfPages(), pw = doc.internal.pageSize.getWidth(), ph = doc.internal.pageSize.getHeight();
-  for (let p = 1; p <= n; p++) { doc.setPage(p); doc.setFontSize(7.5); doc.setTextColor(120); doc.text(`ADMS v6.3 · ${label} · página ${p}/${n}`, 40, ph - 22); doc.text('CUI / PII cuando contiene datos — Privacy Act — destruir según SOP', pw - 40, ph - 22, { align: 'right' }); doc.setTextColor(0); }
+  for (let p = 1; p <= n; p++) { doc.setPage(p); doc.setFontSize(7.5); doc.setTextColor(120); doc.text(`ADMS v6.4 · ${label} · página ${p}/${n}`, 40, ph - 22); doc.text('CUI / PII cuando contiene datos — Privacy Act — destruir según SOP', pw - 40, ph - 22, { align: 'right' }); doc.setTextColor(0); }
 }
 function pdfBar(doc, y, text, L, R) {
   doc.setFillColor(30, 49, 72); doc.rect(L, y - 10, R - L, 16, 'F');
@@ -6922,7 +6925,19 @@ function pdfTable(doc, y, cols, rows, opt = {}) {
   });
   return y;
 }
-function renderPmcsRecord(doc, rec, veh, drivers) {
+/* ---------- PDF OPTIONS (qué sale en el documento) ---------- */
+const PDF_OPT_DEF = { model: true, tm: true, iv: true, odo: true, hours: true, loc: true, op: true, sup: true, counts: true, ids: true, faults: true, action: true, requests: true, na: false, nc: false, pass: false, legend: true, sign: true, summary: true, missing: true };
+const PDF_OPT_GROUPS = [
+  ['DATOS DEL EQUIPO', [['model', 'Modelo y familia', 'DC'], ['tm', 'Referencia TM -10', 'D'], ['iv', 'Intervalo (B/D/A/W)', 'DC'], ['odo', 'Millaje / odómetro actual', 'DC'], ['hours', 'Horas del motor', 'DC'], ['loc', 'Ubicación del vehículo', 'DC']]],
+  ['PERSONAL (PII)', [['op', 'Nombre del operador', 'DC'], ['sup', 'Supervisor / inspector', 'D'], ['ids', 'Registrado por · ID · hash', 'D']]],
+  ['CONTENIDO', [['counts', 'Conteo P/F/NA/NC', 'DC'], ['faults', 'Fallas / deficiencias', 'DC'], ['action', 'Acción correctiva (en fallas)', 'D'], ['requests', 'Requests (NATO, recovery…)', 'DC'], ['na', 'Lista de ítems N/A', 'D'], ['nc', 'Lista de ítems NO verificados', 'D'], ['pass', 'Lista de ítems PASS', 'D']]],
+  ['PIE / CONTROL', [['legend', 'Leyenda de símbolos', 'D'], ['sign', 'Bloque de firmas', 'D'], ['summary', 'Resumen del período', 'C'], ['missing', 'Vehículos sin PMCS en el período', 'C']]]
+];
+const pdfOpts = o => ({ ...PDF_OPT_DEF, ...(o || {}) });
+const catEn = c => String(PMCS_CATS[c] || c).split(' · ').pop();
+function renderPmcsRecord(doc, rec, veh, drivers, o0) {
+  const o = pdfOpts(o0); let sn = 0;
+  const phh = doc.internal.pageSize.getHeight();
   const W = doc.internal.pageSize.getWidth(), L = 40, R = W - 40;
   let y = 44;
   const bumper = veh?.bumper || rec.bumper || '—';
@@ -6931,9 +6946,20 @@ function renderPmcsRecord(doc, rec, veh, drivers) {
   doc.setFontSize(10); doc.text(`${bumper} · STATUS: ${rec.status}${rec.partial ? ' · PARTIAL' : ''}`, R, y, { align: 'right' });
   y += 13; doc.setFont('helvetica', 'normal'); doc.setFontSize(8); doc.setTextColor(90);
   doc.text('Hoja de trabajo ADMS para transcribir al DA Form 5988-E / GCSS-Army. No sustituye el formulario oficial.', L, y); doc.setTextColor(0); y += 16;
-  y = pdfBar(doc, y, '1. EQUIPMENT / INSPECTION DATA', L, R);
+  y = pdfBar(doc, y, `${++sn}. EQUIPMENT / INSPECTION DATA`, L, R);
   const c = rec.counts || {};
-  const pairs = [['Bumper', bumper], ['Model', rec.model || veh?.model], ['Family', FAMILY_LABEL[rec.family || vehFamily(rec.model || veh?.model)]], ['TM ref', veh?.tm || '______ (POR CONFIRMAR)'], ['Date / Time', `${rec.date} ${rec.time || ''}`], ['Interval', ivName(rec.iv)], ['Odometer (mi)', rec.odometer || '—'], ['Hours', rec.hours || '—'], ['Location', rec.location || '—'], ['Operator', opName], ['Supervisor', rec.supervisor || '—'], ['Checked P/F/NA/NC', `${c.pass ?? 0} / ${c.fail ?? 0} / ${c.na ?? 0} / ${c.nc ?? 0}`], ['Recorded by', rec.recordedBy || '—'], ['Record ID / hash', `${rec.id}${rec.hash ? ' · ' + rec.hash : ''}`]];
+  const pairs = [['Bumper', bumper]];
+  if (o.model) pairs.push(['Model', rec.model || veh?.model], ['Family', FAMILY_LABEL[rec.family || vehFamily(rec.model || veh?.model)]]);
+  if (o.tm) pairs.push(['TM ref', veh?.tm || '______ (POR CONFIRMAR)']);
+  pairs.push(['Date / Time', `${rec.date} ${rec.time || ''}`]);
+  if (o.iv) pairs.push(['Interval', ivName(rec.iv)]);
+  if (o.odo) pairs.push(['Odometer (mi)', rec.odometer || '—']);
+  if (o.hours) pairs.push(['Hours', rec.hours || '—']);
+  if (o.loc) pairs.push(['Location', rec.location || '—']);
+  if (o.op) pairs.push(['Operator', opName]);
+  if (o.sup) pairs.push(['Supervisor', rec.supervisor || '—']);
+  if (o.counts) pairs.push(['Checked P/F/NA/NC', `${c.pass ?? 0} / ${c.fail ?? 0} / ${c.na ?? 0} / ${c.nc ?? 0}`]);
+  if (o.ids) pairs.push(['Recorded by', rec.recordedBy || '—'], ['Record ID / hash', `${rec.id}${rec.hash ? ' · ' + rec.hash : ''}`]);
   doc.setFontSize(9);
   const cw = (R - L) / 2;
   for (let i = 0; i < pairs.length; i += 2) {
@@ -6941,34 +6967,48 @@ function renderPmcsRecord(doc, rec, veh, drivers) {
     y += 13;
   }
   y += 4;
-  y = pdfBar(doc, y, '2. FAULTS / DEFICIENCIES / SHORTCOMINGS', L, R);
-  const fr = recFaults(rec).map((f, i) => [i + 1, f.item || '—', f.sym ? PMCS_SYM[f.sym]?.pdf || f.sym : '?', (f.std || f.text || '—') + (f.leak && !/CLASS/.test(f.std || '') ? `, CLASS ${f.leak}` : ''), (f.action || '') + (f.notified ? (f.action ? ' · ' : '') + 'MSG notified' : '')]);
-  y = pdfTable(doc, y, [{ h: '#', w: 22 }, { h: 'ITEM', w: 140 }, { h: 'ST', w: 26, bold: true }, { h: 'FAULT DESCRIPTION', w: 214 }, { h: 'CORRECTIVE ACTION', w: 130 }], fr, { empty: 'NO FAULTS NOTED.' });
-  y += 6;
-  if (y > doc.internal.pageSize.getHeight() - 140) { doc.addPage(); y = 50; }
-  y = pdfBar(doc, y, '3. REQUESTS', L, R);
-  const rr = (rec.requests || []).map(r => [reqLabel(r.type), r.to || '—', r.at || '—', r.status + (r.doneAt ? ' ' + r.doneAt.replace('T', ' ') : ''), r.note || '']);
-  y = pdfTable(doc, y, [{ h: 'REQUEST', w: 150 }, { h: 'TO', w: 80 }, { h: 'TIME', w: 50 }, { h: 'STATUS', w: 110 }, { h: 'NOTE', w: 142 }], rr, { empty: 'NO REQUESTS.' });
+  const ph2 = phh;
+  if (o.faults) {
+    y += 4;
+    y = pdfBar(doc, y, `${++sn}. FAULTS / DEFICIENCIES / SHORTCOMINGS`, L, R);
+    const fr = recFaults(rec).map((f, i) => { const d = (f.std || f.text || '—') + (f.leak && !/CLASS/.test(f.std || '') ? `, CLASS ${f.leak}` : ''); const row = [i + 1, f.item || '—', f.sym ? PMCS_SYM[f.sym]?.pdf || f.sym : '?', d]; if (o.action) row.push((f.action || '') + (f.notified ? (f.action ? ' · ' : '') + 'MSG notified' : '')); return row; });
+    const fcols = [{ h: '#', w: 22 }, { h: 'ITEM', w: 140 }, { h: 'ST', w: 26, bold: true }, { h: 'FAULT DESCRIPTION', w: o.action ? 214 : 344 }]; if (o.action) fcols.push({ h: 'CORRECTIVE ACTION', w: 130 });
+    y = pdfTable(doc, y, fcols, fr, { empty: 'NO FAULTS NOTED.' });
+    y += 6;
+  }
+  if (o.requests) {
+    if (y > ph2 - 140) { doc.addPage(); y = 50; }
+    y = pdfBar(doc, y, `${++sn}. REQUESTS`, L, R);
+    const rr = (rec.requests || []).map(r => [reqLabel(r.type), r.to || '—', r.at || '—', r.status + (r.doneAt ? ' ' + r.doneAt.replace('T', ' ') : ''), r.note || '']);
+    y = pdfTable(doc, y, [{ h: 'REQUEST', w: 150 }, { h: 'TO', w: 80 }, { h: 'TIME', w: 50 }, { h: 'STATUS', w: 110 }, { h: 'NOTE', w: 142 }], rr, { empty: 'NO REQUESTS.' });
+  }
+  if (o.na || o.nc || o.pass) {
+    const allIt = pmcsItems(rec.model || veh?.model).filter(i => ivShow(i, rec.iv || 'B'));
+    const rm = rec.results;
+    const listSec = (title, arr) => {
+      y += 6; if (y > ph2 - 140) { doc.addPage(); y = 50; }
+      y = pdfBar(doc, y, `${++sn}. ${title} (${arr.length})`, L, R);
+      y = pdfTable(doc, y, [{ h: '#', w: 22 }, { h: 'CATEGORY', w: 150 }, { h: 'ITEM', w: 340 }], arr.map((i, k) => [k + 1, catEn(i.cat), i.en]), { empty: 'NONE.' });
+    };
+    if (!rm) { y += 6; doc.setFontSize(8); doc.text('Item-level results were not stored for this record (older version).', L, y); y += 10; }
+    else {
+      if (o.na) listSec('ITEMS MARKED N/A', allIt.filter(i => rm[i.id] === 'NA'));
+      if (o.nc) listSec('ITEMS NOT CHECKED', allIt.filter(i => !rm[i.id]));
+      if (o.pass) listSec('ITEMS PASS', allIt.filter(i => rm[i.id] === 'PASS'));
+    }
+  }
   if ((rec.edits || []).length) { y += 4; doc.setFontSize(8); doc.setTextColor(150, 90, 0); doc.text(`EDITED ${(rec.edits || []).length}x same day — last: ${(rec.editedAt || '').replace('T', ' ').slice(0, 16)} by ${rec.editedBy || '—'}`, L, y); doc.setTextColor(0); y += 10; }
   if (rec.partial) { y += 4; doc.setFontSize(8); doc.setTextColor(150, 90, 0); doc.text(`PARTIAL PMCS — ${c.nc || 0} item(s) not checked. Status did not improve the previous vehicle status.`, L, y); doc.setTextColor(0); y += 10; }
-  y += 6; doc.setFontSize(7.5); doc.setTextColor(90);
+  if (o.legend) { y += 6; doc.setFontSize(7.5); doc.setTextColor(90);
   doc.text('ST: X = deficiency (NMC) · (X) = operate under limitations · / = shortcoming · - = inspection/service overdue · ? = not classified (DA PAM 750-8). Checklist genérico ADMS — POR CONFIRMAR contra TM -10.', L, y, { maxWidth: R - L });
-  doc.setTextColor(0); y += 26;
+  doc.setTextColor(0); y += 26; } else y += 10;
   if (y > doc.internal.pageSize.getHeight() - 90) { doc.addPage(); y = 70; }
   const sw = (R - L - 40) / 3;
-  [['OPERATOR', opName === '—' ? '' : opName], ['SUPERVISOR / MOTOR SGT', rec.supervisor || ''], ['DATE', '']].forEach((s, i) => {
+  if (o.sign) [['OPERATOR', o.op && opName !== '—' ? opName : ''], ['SUPERVISOR / MOTOR SGT', o.sup ? (rec.supervisor || '') : ''], ['DATE', '']].forEach((s, i) => {
     const x = L + i * (sw + 20);
     doc.line(x, y + 26, x + sw, y + 26); doc.setFontSize(8); doc.setFont('helvetica', 'bold'); doc.text(s[0], x, y + 37);
     doc.setFont('helvetica', 'normal'); if (s[1]) doc.text(doc.splitTextToSize(s[1], sw)[0], x, y + 48);
   });
-}
-function makePmcsPdf(rec, veh, drivers) {
-  const { jsPDF } = window.jspdf;
-  const doc = new jsPDF({ unit: 'pt', format: 'letter' });
-  renderPmcsRecord(doc, rec, veh, drivers);
-  pdfFooter(doc, `PMCS ${veh?.bumper || rec.bumper || ''} ${rec.date}`);
-  doc.save(`PMCS_${String(veh?.bumper || rec.bumper || 'VEH').replace(/[^\w-]+/g, '_')}_${rec.date}_${rec.iv || 'B'}.pdf`);
-  audit('PMCS PDF', `${veh?.bumper || rec.bumper || ''} ${rec.date} ${rec.status}`, 'Vehículo');
 }
 function pmcsRange(kind, from, to) {
   const t = new Date();
@@ -6987,63 +7027,122 @@ function collectPmcs(pmcs, vehs, vehSel, a, b) {
   });
   return out.sort((x, y) => (x.r.date + (x.r.time || '')).localeCompare(y.r.date + (y.r.time || '')) || String(x.veh?.bumper || x.r.bumper).localeCompare(String(y.veh?.bumper || y.r.bumper)));
 }
-function makePmcsReport({ type, rows, vehs, vehSel, a, b, drivers }) {
+function buildPmcsDoc({ type, rows, vehs, vehSel, a, b, drivers, o: o0, single }) {
+  const o = pdfOpts(o0);
   const { jsPDF } = window.jspdf;
   const tag = a === b ? a : `${a}_a_${b}`;
   if (type === 'DETAIL') {
     const doc = new jsPDF({ unit: 'pt', format: 'letter' });
-    rows.forEach((x, i) => { if (i) doc.addPage(); renderPmcsRecord(doc, x.r, x.veh, drivers); });
-    pdfFooter(doc, `PMCS detallado ${a}${a !== b ? ' to ' + b : ''}`);
-    doc.save(`PMCS_DETALLADO_${tag}.pdf`);
-  } else {
-    const doc = new jsPDF({ unit: 'pt', format: 'letter', orientation: 'landscape' });
-    const W = doc.internal.pageSize.getWidth(), L = 40, R = W - 40;
-    let y = 42;
-    doc.setFont('helvetica', 'bold'); doc.setFontSize(14); doc.text('PMCS SUMMARY / COMPLIANCE REPORT', L, y);
-    doc.setFontSize(9); doc.setFont('helvetica', 'normal'); doc.text(`Period: ${a}${a !== b ? ' to ' + b : ''} · Generated: ${nowLocal().replace('T', ' ')} · By: ${getOperator() || '—'}`, R, y, { align: 'right' });
-    y += 18;
-    const fleet = vehSel === 'ALL' ? vehs : vehs.filter(v => v.id === vehSel);
-    const insp = new Set(rows.map(x => x.vid));
-    const cnt = s => rows.filter(x => x.r.status === s).length;
-    const openReq = rows.reduce((n, x) => n + (x.r.requests || []).filter(q => q.status === 'REQUESTED').length, 0);
-    y = pdfBar(doc, y, `SUMMARY — ${rows.length} PMCS · ${insp.size}/${fleet.length} vehicles inspected · GREEN ${cnt('GREEN')} · AMBER ${cnt('AMBER')} · RED ${cnt('RED')} · partial ${rows.filter(x => x.r.partial).length} · open requests ${openReq}`, L, R);
-    const tr = rows.map(x => { const r = x.r, c = r.counts || {}; return [r.date, r.time || '', x.veh?.bumper || r.bumper || '—', (r.model || x.veh?.model || '').replace(/\s+/g, ' '), r.iv || '', recOpName(r, drivers) || '—', r.status + (r.partial ? ' (P)' : ''), `${c.pass ?? 0}/${c.fail ?? 0}/${c.na ?? 0}/${c.nc ?? 0}`, recFaults(r).map(f => `${f.sym ? (PMCS_SYM[f.sym]?.pdf || f.sym) : '?'} ${(f.std || f.text || f.item || '').replace(/\n/g, ' ')}`).join(' | ') || '—', (r.requests || []).map(q => `${reqLabel(q.type)} (${q.status})`).join(', ') || '—']; });
-    y = pdfTable(doc, y, [{ h: 'DATE', w: 56 }, { h: 'TIME', w: 32 }, { h: 'BUMPER', w: 52, bold: true }, { h: 'MODEL', w: 82 }, { h: 'INT', w: 22 }, { h: 'OPERATOR', w: 80 }, { h: 'RESULT', w: 52, bold: true }, { h: 'P/F/NA/NC', w: 50 }, { h: 'FAULTS', w: 186 }, { h: 'REQUESTS', w: 100 }], tr, { fs: 7.5, empty: 'NO PMCS RECORDS IN PERIOD.', top: 44 });
-    y += 10;
+    rows.forEach((x, i) => { if (i) doc.addPage(); renderPmcsRecord(doc, x.r, x.veh, drivers, o); });
+    pdfFooter(doc, single ? `PMCS ${single.bumper || ''} ${single.date}` : `PMCS detallado ${a}${a !== b ? ' to ' + b : ''}`);
+    const name = single ? `PMCS_${String(single.bumper || 'VEH').replace(/[^\w-]+/g, '_')}_${single.date}_${single.iv || 'B'}.pdf` : `PMCS_DETALLADO_${tag}.pdf`;
+    return { doc, name };
+  }
+  const doc = new jsPDF({ unit: 'pt', format: 'letter', orientation: 'landscape' });
+  const W = doc.internal.pageSize.getWidth(), L = 40, R = W - 40, TOTAL = R - L;
+  let y = 42;
+  doc.setFont('helvetica', 'bold'); doc.setFontSize(14); doc.text('PMCS SUMMARY / COMPLIANCE REPORT', L, y);
+  doc.setFontSize(9); doc.setFont('helvetica', 'normal'); doc.text(`Period: ${a}${a !== b ? ' to ' + b : ''} · Generated: ${nowLocal().replace('T', ' ')}${o.ids ? ' · By: ' + (getOperator() || '—') : ''}`, R, y, { align: 'right' });
+  y += 18;
+  const fleet = vehSel === 'ALL' ? vehs : vehs.filter(v => v.id === vehSel);
+  const insp = new Set(rows.map(x => x.vid));
+  const cnt = s => rows.filter(x => x.r.status === s).length;
+  const openReq = rows.reduce((n, x) => n + (x.r.requests || []).filter(q => q.status === 'REQUESTED').length, 0);
+  if (o.summary) y = pdfBar(doc, y, `SUMMARY — ${rows.length} PMCS · ${insp.size}/${fleet.length} vehicles inspected · GREEN ${cnt('GREEN')} · AMBER ${cnt('AMBER')} · RED ${cnt('RED')} · partial ${rows.filter(x => x.r.partial).length} · open requests ${openReq}`, L, R);
+  const cnts = r => { const c = r.counts || {}; return `${c.pass ?? 0}/${c.fail ?? 0}/${c.na ?? 0}/${c.nc ?? 0}`; };
+  const C = [
+    ['DATE', 56, r => r.date, 1], ['TIME', 32, r => r.time || '', 1], ['BUMPER', 52, (r, x) => x.veh?.bumper || r.bumper || '—', 1, true],
+    ['MODEL', 82, (r, x) => (r.model || x.veh?.model || '').replace(/\s+/g, ' '), o.model], ['INT', 22, r => r.iv || '', o.iv], ['OPERATOR', 80, r => recOpName(r, drivers) || '—', o.op],
+    ['ODO (mi)', 46, r => r.odometer || '—', o.odo], ['HRS', 34, r => r.hours || '—', o.hours], ['LOCATION', 60, r => r.location || '—', o.loc],
+    ['RESULT', 52, r => r.status + (r.partial ? ' (P)' : ''), 1, true], ['P/F/NA/NC', 50, cnts, o.counts],
+    ['FAULTS', 0, r => recFaults(r).map(f => `${f.sym ? (PMCS_SYM[f.sym]?.pdf || f.sym) : '?'} ${(f.std || f.text || f.item || '').replace(/\n/g, ' ')}`).join(' | ') || '—', o.faults],
+    ['REQUESTS', 100, r => (r.requests || []).map(q => `${reqLabel(q.type)} (${q.status})`).join(', ') || '—', o.requests]
+  ].filter(c => c[3]);
+  const fixed = C.reduce((n, c) => n + c[1], 0), hasF = C.some(c => c[0] === 'FAULTS');
+  const fw = hasF ? Math.max(110, TOTAL - fixed) : 0, scale = Math.min(1, TOTAL / (fixed + fw));
+  const cols = C.map(c => ({ h: c[0], w: Math.floor((c[0] === 'FAULTS' ? fw : c[1]) * scale), bold: !!c[4] }));
+  const tr = rows.map(x => C.map(c => c[2](x.r, x)));
+  y = pdfTable(doc, y, cols, tr, { fs: 7.5, empty: 'NO PMCS RECORDS IN PERIOD.', top: 44 });
+  y += 10;
+  if (o.missing) {
     const missing = sortVehiclesByBumper(fleet.filter(v => !insp.has(v.id)));
     if (y > doc.internal.pageSize.getHeight() - 90) { doc.addPage(); y = 50; }
     y = pdfBar(doc, y, `VEHICLES WITHOUT PMCS IN PERIOD (${missing.length})`, L, R);
     doc.setFontSize(8.5); doc.text(doc.splitTextToSize(missing.map(v => `${v.bumper} (${v.model})`).join(' · ') || 'NONE — 100% inspected.', R - L), L, y);
-    pdfFooter(doc, `PMCS compacto ${a}${a !== b ? ' to ' + b : ''}`);
-    doc.save(`PMCS_COMPACTO_${tag}.pdf`);
   }
-  audit('PMCS REPORTE', `${type} ${a}→${b} · ${rows.length} registros`, 'Vehículo');
+  pdfFooter(doc, `PMCS compacto ${a}${a !== b ? ' to ' + b : ''}`);
+  return { doc, name: `PMCS_COMPACTO_${tag}.pdf` };
 }
 
-/* ---------- EXPORT MODAL ---------- */
-function PmcsExportModal({ vehs, pmcs, drivers, onClose, defaultVeh }) {
-  const [type, setType] = useState('COMPACT');
+/* ---------- EXPORT MODAL (opciones + vista previa) ---------- */
+function PmcsExportModal({ vehs, pmcs, drivers, onClose, defaultVeh, single }) {
+  const [type, setType] = useState(single ? 'DETAIL' : 'COMPACT');
   const [range, setRange] = useState('TODAY');
   const [from, setFrom] = useState(todayStr());
   const [to, setTo] = useState(todayStr());
   const [vehSel, setVehSel] = useState('ALL');
-  const [a, b] = pmcsRange(range, from, to);
-  const rows = useMemo(() => collectPmcs(pmcs, vehs, vehSel, a, b), [pmcs, vehs, vehSel, a, b]);
+  const [o, setO] = useState(() => pdfOpts(LS.get('adms:pmcs-pdfopts')));
+  const [pv, setPv] = useState(true);
+  const [url, setUrl] = useState('');
+  const [perr, setPerr] = useState('');
+  const urlRef = useRef('');
+  const [a, b] = single ? [single.date, single.date] : pmcsRange(range, from, to);
+  const rows = useMemo(() => single ? [{ r: single, veh: vehs.find(v => v.id === single.vehId) || vehs[0], vid: single.vehId }] : collectPmcs(pmcs, vehs, vehSel, a, b), [pmcs, vehs, vehSel, a, b, single]);
+  useEffect(() => { try { LS.set('adms:pmcs-pdfopts', o); } catch (e) {} }, [o]);
+  const args = { type, rows, vehs, vehSel, a, b, drivers, o, single };
+  useEffect(() => {
+    if (!pv) return;
+    let dead = false;
+    const t = setTimeout(() => {
+      try {
+        if (a > b) { setPerr('La fecha "desde" es posterior a "hasta"'); return; }
+        if (type === 'DETAIL' && !rows.length) { setPerr('No hay PMCS en ese período'); return; }
+        const { doc } = buildPmcsDoc({ ...args, rows: type === 'DETAIL' ? rows.slice(0, 3) : rows });
+        const u = URL.createObjectURL(doc.output('blob'));
+        if (dead) { URL.revokeObjectURL(u); return; }
+        if (urlRef.current) URL.revokeObjectURL(urlRef.current);
+        urlRef.current = u; setUrl(u); setPerr('');
+      } catch (e) { console.error(e); setPerr('No se pudo generar la vista previa: ' + e.message); }
+    }, 350);
+    return () => { dead = true; clearTimeout(t); };
+  }, [type, rows, o, pv, a, b, vehSel]);
+  useEffect(() => () => { if (urlRef.current) URL.revokeObjectURL(urlRef.current); }, []);
   const go = () => {
     if (a > b) { showToast('La fecha "desde" es posterior a "hasta"', 'error'); return; }
     if (type === 'DETAIL' && !rows.length) { showToast('No hay PMCS en ese período', 'error'); return; }
-    try { makePmcsReport({ type, rows, vehs, vehSel, a, b, drivers }); showToast('PDF generado', 'success'); onClose(); } catch (e) { console.error(e); showToast('Error generando PDF: ' + e.message, 'error'); }
+    try {
+      const { doc, name } = buildPmcsDoc(args);
+      doc.save(name);
+      if (single) audit('PMCS PDF', `${single.bumper || ''} ${single.date} ${single.status}`, 'Vehículo');
+      else audit('PMCS REPORTE', `${type} ${a}→${b} · ${rows.length} registros`, 'Vehículo');
+      showToast('PDF generado', 'success'); onClose();
+    } catch (e) { console.error(e); showToast('Error generando PDF: ' + e.message, 'error'); }
   };
   const seg = (val, set, opts) => hh('div', { className: 'filter-group', role: 'radiogroup' }, opts.map(([k, l]) => hh('button', { key: k, type: 'button', role: 'radio', 'aria-checked': val === k, className: `filter-btn${val === k ? ' active' : ''}`, onClick: () => set(k) }, l)));
-  return hh(Modal, { title: 'EXPORTAR PMCS (PDF)', onClose },
-    hh('div', { className: 'field' }, hh('label', null, 'Tipo de documento'), seg(type, setType, [['COMPACT', 'COMPACTO — todos los vehículos en tabla'], ['DETAIL', 'DETALLADO — una página por PMCS']])),
-    hh('div', { className: 'field' }, hh('label', null, 'Período'), seg(range, setRange, [['TODAY', 'HOY'], ['WEEK', 'ÚLTIMOS 7 DÍAS'], ['MONTH', 'ESTE MES'], ['RANGE', 'RANGO']])),
-    range === 'RANGE' && hh('div', { className: 'grid2' }, hh('div', { className: 'field' }, hh('label', null, 'Desde'), hh('input', { type: 'date', value: from, onChange: e => setFrom(e.target.value) })), hh('div', { className: 'field' }, hh('label', null, 'Hasta'), hh('input', { type: 'date', value: to, onChange: e => setTo(e.target.value) }))),
-    hh('div', { className: 'field' }, hh('label', null, 'Vehículos'), hh('select', { value: vehSel, onChange: e => setVehSel(e.target.value) }, hh('option', { value: 'ALL' }, 'Todos'), sortVehiclesByBumper(vehs).map(v => hh('option', { key: v.id, value: v.id }, v.bumper, ' — ', v.model)))),
-    hh('div', { className: 'pmcs-ref' }, `${a}${a !== b ? ' → ' + b : ''} · ${rows.length} PMCS · ${new Set(rows.map(x => x.vid)).size} vehículo(s)`, type === 'COMPACT' && hh('div', null, 'Incluye resumen, tabla de todos los PMCS y vehículos SIN PMCS en el período (evidencia de cumplimiento).')),
+  const tk = type === 'DETAIL' ? 'D' : 'C';
+  const preset = k => setO(k === 'ALL' ? Object.fromEntries(Object.keys(PDF_OPT_DEF).map(x => [x, true])) : k === 'NOPII' ? { ...PDF_OPT_DEF, op: false, sup: false, ids: false } : { ...PDF_OPT_DEF });
+  return hh(Modal, { title: single ? `PDF DE ESTE PMCS — ${single.bumper || ''}` : 'EXPORTAR PMCS (PDF)', onClose, wide: true },
+    hh('div', { className: 'exp-grid' },
+      hh('div', { className: 'exp-opts' },
+        !single && hh('div', { className: 'field' }, hh('label', null, 'Tipo de documento'), seg(type, setType, [['COMPACT', 'COMPACTO — tabla'], ['DETAIL', 'DETALLADO — 1 página por PMCS']])),
+        !single && hh('div', { className: 'field' }, hh('label', null, 'Período'), seg(range, setRange, [['TODAY', 'HOY'], ['WEEK', '7 DÍAS'], ['MONTH', 'ESTE MES'], ['RANGE', 'RANGO']])),
+        !single && range === 'RANGE' && hh('div', { className: 'grid2' }, hh('div', { className: 'field' }, hh('label', null, 'Desde'), hh('input', { type: 'date', value: from, onChange: e => setFrom(e.target.value) })), hh('div', { className: 'field' }, hh('label', null, 'Hasta'), hh('input', { type: 'date', value: to, onChange: e => setTo(e.target.value) }))),
+        !single && hh('div', { className: 'field' }, hh('label', null, 'Vehículos'), hh('select', { value: vehSel, onChange: e => setVehSel(e.target.value) }, hh('option', { value: 'ALL' }, 'Todos'), sortVehiclesByBumper(vehs).map(v => hh('option', { key: v.id, value: v.id }, v.bumper, ' — ', v.model)))),
+        !single && hh('div', { className: 'pmcs-ref' }, `${a}${a !== b ? ' → ' + b : ''} · ${rows.length} PMCS · ${new Set(rows.map(x => x.vid)).size} vehículo(s)`),
+        hh('div', { className: 'field' }, hh('label', null, 'Qué sale en el documento'),
+          hh('div', { className: 'filter-group' }, [['DEF', 'PREDETERMINADO'], ['ALL', 'TODO'], ['NOPII', 'SIN NOMBRES']].map(([k, l]) => hh('button', { key: k, type: 'button', className: 'filter-btn', onClick: () => preset(k) }, l)))),
+        PDF_OPT_GROUPS.map(([title, list]) => { const vis = list.filter(x => x[2].includes(tk)); if (!vis.length) return null; return hh('div', { key: title, className: 'opt-grp' }, hh('div', { className: 'opt-grp-title' }, title), vis.map(([k, lbl]) => hh('label', { key: k, className: 'chk-line' }, hh('input', { type: 'checkbox', checked: !!o[k], onChange: e => setO(p => ({ ...p, [k]: e.target.checked })) }), ' ', lbl))); }),
+        hh('div', { className: 'mono-sm' }, 'Siempre salen: bumper, fecha/hora, estado, nota de PMCS PARCIAL, nota de EDITADO y el aviso CUI/Privacy Act (integridad de la evidencia).')),
+      hh('div', { className: 'exp-prev' },
+        hh('div', { className: 'exp-prev-head' }, hh('b', null, 'VISTA PREVIA'),
+          hh('label', { className: 'chk-line' }, hh('input', { type: 'checkbox', checked: pv, onChange: e => setPv(e.target.checked) }), ' activa'),
+          url && pv && hh('button', { type: 'button', className: 'btn btn-ghost btn-sm', onClick: () => { try { window.open(url, '_blank'); } catch (e) {} } }, 'ABRIR EN PESTAÑA')),
+        !pv ? hh('div', { className: 'no-items' }, 'Vista previa desactivada.') : perr ? hh('div', { className: 'warn-hint' }, perr) : url ? hh('iframe', { className: 'exp-frame', title: 'Vista previa del PDF', src: url + '#toolbar=0&navpanes=0&view=FitH' }) : hh('div', { className: 'no-items' }, 'Generando…'),
+        type === 'DETAIL' && rows.length > 3 && pv && hh('div', { className: 'mono-sm' }, `Vista previa de los primeros 3 de ${rows.length} PMCS. El PDF final incluye todos.`),
+        pv && hh('div', { className: 'mono-sm' }, 'Si tu teléfono no muestra el PDF aquí, usa ABRIR EN PESTAÑA.'))),
     hh('div', { className: 'modal-actions', style: { display: 'flex', gap: '8px', marginTop: '14px' } },
       hh('button', { className: 'btn btn-ghost', style: { flex: 1 }, onClick: onClose }, 'CANCELAR'),
-      hh('button', { className: 'btn btn-primary', style: { flex: 1 }, onClick: go }, I.Download, ' GENERAR PDF')));
+      hh('button', { className: 'btn btn-primary', style: { flex: 1 }, onClick: go }, I.Download, ' DESCARGAR PDF')));
 }
 
 /* ---------- HISTORY MODAL (evidencia por vehículo) ---------- */
@@ -7051,6 +7150,7 @@ function PmcsHistoryModal({ veh, pmcs, setPmcs, drivers, onClose, onEdit }) {
   const list = pmcs[veh.id] || [];
   const [open, setOpen] = useState(null);
   const [exp, setExp] = useState(false);
+  const [pdfRec, setPdfRec] = useState(null);
   const days = useMemo(() => { const out = []; const t = new Date(); for (let i = 29; i >= 0; i--) { const d = new Date(t); d.setDate(d.getDate() - i); const iso = toISO(d); const rs = list.filter(r => r.date === iso); out.push({ iso, n: rs.length, st: rs.reduce((s, r) => worstSt(s, r.status), null) }); } return out; }, [list]);
   const done30 = days.filter(d => d.n).length;
   const setReq = (rid, k, status) => {
@@ -7073,7 +7173,7 @@ function PmcsHistoryModal({ veh, pmcs, setPmcs, drivers, onClose, onEdit }) {
           hh('div', null, hh('span', { className: 'hdate' }, r.date, ' ', r.time || ''), hh('span', { className: 'hop' }, ivName(r.iv)), hh('span', { className: 'hop' }, recOpName(r, drivers) || 'sin operador'), r.partial && hh('span', { className: 'hfault' }, 'PARCIAL')),
           hh('div', { className: 'inline-row' }, fl.length > 0 && hh('span', { className: 'hfault' }, fl.length, ' FALLA', fl.length > 1 ? 'S' : ''), (r.requests || []).some(q => q.status === 'REQUESTED') && hh('span', { className: 'hreq' }, 'REQ'), hh(Dot, { status: r.status, label: true }),
             canEditRec(r) && onEdit && hh('button', { type: 'button', className: 'btn btn-primary btn-sm', onClick: e => { e.stopPropagation(); onEdit(r); } }, 'EDITAR'),
-            hh('button', { type: 'button', className: 'btn btn-ghost btn-sm', onClick: e => { e.stopPropagation(); makePmcsPdf(r, veh, drivers); } }, 'PDF'))),
+            hh('button', { type: 'button', className: 'btn btn-ghost btn-sm', onClick: e => { e.stopPropagation(); setPdfRec(r); } }, 'PDF'))),
         isOpen && hh('div', { className: 'hist-detail' },
           fl.length ? fl.map((f, k) => hh('div', { key: k }, hh('b', null, f.sym ? PMCS_SYM[f.sym]?.s + ' ' : '? '), f.item, f.std || f.text ? ' — ' + (f.std || f.text).replace(/\n/g, ' · ') : '')) : hh('div', null, 'Sin fallas'),
           (r.requests || []).map((q, k) => hh('div', { key: 'q' + k, className: 'req-line' }, hh('b', null, reqLabel(q.type)), ` → ${q.to || '—'} · ${q.at || ''} · ${REQ_STATUS[q.status] || q.status}${q.doneAt ? ' ' + q.doneAt.replace('T', ' ') : ''}${q.note ? ' · ' + q.note : ''} `,
@@ -7083,7 +7183,8 @@ function PmcsHistoryModal({ veh, pmcs, setPmcs, drivers, onClose, onEdit }) {
           hh('div', { className: 'mono-sm' }, `Registrado por: ${r.recordedBy || '—'} · ${r.ts ? r.ts.replace('T', ' ').slice(0, 19) : ''} · ID ${r.id}${r.hash ? ' · hash ' + r.hash : ''}`)));
     }),
     list.length >= PMCS_CAP && hh('div', { className: 'warn-hint' }, `⚠ Se guardan los últimos ${PMCS_CAP} por vehículo. Exporta el PDF compacto mensual como evidencia permanente.`),
-    exp && hh(PmcsExportModal, { vehs: [veh], pmcs: { [veh.id]: list }, drivers, defaultVeh: null, onClose: () => setExp(false) }));
+    exp && hh(PmcsExportModal, { vehs: [veh], pmcs: { [veh.id]: list }, drivers, defaultVeh: null, onClose: () => setExp(false) }),
+    pdfRec && hh(PmcsExportModal, { vehs: [veh], pmcs: { [veh.id]: list }, drivers, single: pdfRec, onClose: () => setPdfRec(null) }));
 }
 
 /* ---------- PMCS TAB ---------- */
@@ -7107,6 +7208,7 @@ function PmcsTab({ vehs, setVehs, drivers, pmcs, setPmcs }) {
   const [expOpen, setExpOpen] = useState(false);
   const [busy, setBusy] = useState(false);
   const [editId, setEditId] = useState(null);
+  const [pdfRec, setPdfRec] = useState(null);
   const veh = vehs.find(v => v.id === selVeh);
   const allItems = useMemo(() => veh ? pmcsItems(veh.model) : [], [veh && veh.model]);
   const items = useMemo(() => allItems.filter(i => ivShow(i, iv)), [allItems, iv]);
@@ -7230,7 +7332,7 @@ function PmcsTab({ vehs, setVehs, drivers, pmcs, setPmcs }) {
       hh('div', { className: 'pmcs-done-title' }, (done.edits || []).length ? 'PMCS ACTUALIZADO — ' : 'PMCS REGISTRADO — ', done.status, done.partial ? ' (PARCIAL)' : ''),
       hh('div', { className: 'pmcs-done-sub' }, `${done.date} ${done.time} · ${done.faults.length} falla(s) · ${done.requests.length} request(s)${done.partial ? ` · ${done.counts.nc} sin verificar` : ''}${done.hash ? ' · hash ' + done.hash : ''}`),
       hh('div', { className: 'inline-row', style: { justifyContent: 'center', marginTop: '16px', flexWrap: 'wrap' } },
-        hh('button', { className: 'btn btn-primary', onClick: () => makePmcsPdf(done, veh, drivers) }, I.Download, ' PDF DE ESTE PMCS'),
+        hh('button', { className: 'btn btn-primary', onClick: () => setPdfRec(done) }, I.Download, ' PDF DE ESTE PMCS'),
         canEditRec(done) && hh('button', { className: 'btn btn-ghost', onClick: () => startEdit(done) }, I.Edit || '✎', ' EDITAR ESTE PMCS'),
         hh('button', { className: 'btn btn-ghost', onClick: () => setHistOpen(true) }, I.Clock, ' HISTORIAL'),
         hh('button', { className: 'btn btn-ghost', onClick: () => { clearForm(); setDone(null); } }, I.Plus, ' NUEVA INSPECCIÓN'))) :
@@ -7273,7 +7375,8 @@ function PmcsTab({ vehs, setVehs, drivers, pmcs, setPmcs }) {
         hh('div', null, hh('span', { className: 'hdate' }, fmtDate(r.date), r.time ? ' ' + r.time : ''), hh('span', { className: 'hop' }, recOpName(r, drivers) || '—'), r.partial && hh('span', { className: 'hfault' }, 'PARCIAL')),
         hh('div', { className: 'inline-row' }, recFaults(r).length > 0 && hh('span', { className: 'hfault' }, recFaults(r).length, ' FALLA(S)'), (r.edits || []).length > 0 && hh('span', { className: 'hreq' }, 'EDIT'), canEditRec(r) && hh('button', { type: 'button', className: 'btn btn-ghost btn-sm', onClick: () => startEdit(r) }, 'EDITAR'), hh(Dot, { status: r.status, label: true }))))),
     histOpen && veh && hh(PmcsHistoryModal, { veh, pmcs, setPmcs, drivers, onClose: () => setHistOpen(false), onEdit: startEdit }),
-    expOpen && hh(PmcsExportModal, { vehs, pmcs, drivers, defaultVeh: selVeh, onClose: () => setExpOpen(false) }));
+    expOpen && hh(PmcsExportModal, { vehs, pmcs, drivers, defaultVeh: selVeh, onClose: () => setExpOpen(false) }),
+    pdfRec && hh(PmcsExportModal, { vehs, pmcs, drivers, single: pdfRec, onClose: () => setPdfRec(null) }));
 }
 
 function FuelLogTab({
@@ -7414,7 +7517,7 @@ function FuelLogTab({
       html += `</tbody></table>`;
     });
     html += `<div class="sig"><div class="sig-line">Motor Sergeant / Firma &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Fecha</div><div class="sig-line">Convoy Commander / Firma &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Fecha</div></div>
-    <div class="footer">ADMS v6.3 — Army Driver Management System | 124 MP HHD | Fort Buchanan PR</div>`;
+    <div class="footer">ADMS v6.4 — Army Driver Management System | 124 MP HHD | Fort Buchanan PR</div>`;
     const elem = document.createElement('div');
     elem.innerHTML = html;
     elem.style.cssText = 'position:fixed;top:-9999px;left:-9999px;background:white;width:8.5in;font-family:Arial,sans-serif;';
@@ -8129,7 +8232,7 @@ function ExportModal({
             pdf.setPage(p);
             pdf.setFontSize(7);
             pdf.setTextColor(110);
-            pdf.text(`ADMS v6.3 · ${todayStr()} · página ${p}/${np}`, pgW - 8, pgH - 5, {
+            pdf.text(`ADMS v6.4 · ${todayStr()} · página ${p}/${np}`, pgW - 8, pgH - 5, {
               align: 'right'
             });
           }
@@ -8675,7 +8778,7 @@ function ExportXlsxModal({
           'Valor': '124 MP HHD / Fort Buchanan PR'
         }, {
           'Campo': 'Generado Por',
-          'Valor': 'ADMS v6.3'
+          'Valor': 'ADMS v6.4'
         }, {
           'Campo': 'Total Conductores',
           'Valor': opts.includeDrivers ? filteredDrivers.length : 0
@@ -9928,16 +10031,16 @@ function HelpModal({
     className: "help-sec"
   }, React.createElement("h3", null, t), children);
   return React.createElement(Modal, {
-    title: "GU\xCDA R\xC1PIDA \u2014 ADMS v6.3",
+    title: "GU\xCDA R\xC1PIDA \u2014 ADMS v6.4",
     onClose: onClose,
     wide: true
   }, React.createElement("div", {
     className: "help-content"
   }, React.createElement("h2", {
     className: "help-print-title"
-  }, "ADMS v6.3 \u2014 Gu\xEDa r\xE1pida"), React.createElement(S, {
+  }, "ADMS v6.4 \u2014 Gu\xEDa r\xE1pida"), React.createElement(S, {
     t: "1. Antes de empezar"
-  }, React.createElement("ul", null, React.createElement("li", null, "Abre ", React.createElement("b", null, "ADMS-v6.3.html"), " en Chrome o Edge. No necesita internet y no env\xEDa datos a ning\xFAn lado."), React.createElement("li", null, "Los datos viven ", React.createElement("b", null, "solo en ese navegador y esa computadora"), ". Otro navegador u otra PC = ADMS vac\xEDo."), React.createElement("li", null, "Pon tu nombre en ", React.createElement("b", null, "OP:"), " (arriba a la derecha). Cada cambio queda en la BIT\xC1CORA con ese nombre."))), React.createElement(S, {
+  }, React.createElement("ul", null, React.createElement("li", null, "Abre ", React.createElement("b", null, "ADMS-v6.4.html"), " en Chrome o Edge. No necesita internet y no env\xEDa datos a ning\xFAn lado."), React.createElement("li", null, "Los datos viven ", React.createElement("b", null, "solo en ese navegador y esa computadora"), ". Otro navegador u otra PC = ADMS vac\xEDo."), React.createElement("li", null, "Pon tu nombre en ", React.createElement("b", null, "OP:"), " (arriba a la derecha). Cada cambio queda en la BIT\xC1CORA con ese nombre."))), React.createElement(S, {
     t: "2. Cargar los datos de la unidad"
   }, React.createElement("ol", null, React.createElement("li", null, "DRIVERS \u2192 ", React.createElement("b", null, "PLANTILLA"), ". Se descarga un Excel con los conductores actuales."), React.createElement("li", null, "Llena veh\xEDculos autorizados (separados con ", React.createElement("b", null, "\" | \""), ", nombres exactos de la hoja MODELOS), fechas del DA 5984-E y calificaciones."), React.createElement("li", null, "DRIVERS \u2192 ", React.createElement("b", null, "importar XLSX"), " \u2192 revisa la vista previa \u2192 ", React.createElement("b", null, "CONFIRMAR"), ". Nada se borra; una celda vac\xEDa no cambia el dato actual."))), React.createElement(S, {
     t: "3. Backup (lo m\xE1s importante)"
